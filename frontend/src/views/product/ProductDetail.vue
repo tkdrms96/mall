@@ -103,17 +103,19 @@
                     name="quantity"
                     min="1"
                     max="10"
-                    value="1"
+                    :value="items.count" 
+                    @keyup.enter="addOptionCount"
+                    @input="addOptionCount"
                   />
-                  <button class="plus">
+                  <button class="plus" @click="addOptionCount(items)">
                     <span class="ic_set ic_plus"></span>
                   </button>
                 </span>
                 <p class="txt_price">
-                  <span class="price"> {{ items.price > 0 ? joinComma(items.price) +'원' : ''}}</span>
+                  <span class="price"> {{ items.price > 0 ? joinComma(items.totalPrice) +'원' : ''}}</span>
                 </p>
-                <button class="del" title="삭제">
-                  <i class="ic_set ic_del"></i>
+                <button class="del" title="삭제" >
+                  <i class="ic_set ic_del" @click="removeProductOption(items)"></i>
                 </button>
               </div>
             </div>
@@ -123,8 +125,8 @@
             <!-- 금액 처리 -->
             <div class="item_total">
               <span class="txt total">총 금액(VAT포함)</span>
-              <span class="txt price">{{ purchasePrice + "원" }}</span>
-              <a class="major large flex" @click="statusbar">
+              <span class="txt price">{{ parseInt(purchasePrice) + parseInt(purchaseOptionPrice) + ',000원' }}</span>
+              <a class="major large flex" @click="purchase">
                 <span class="txt">구매하기</span>
               </a>
             </div>
@@ -159,6 +161,13 @@ export default {
       let result = this.product.price * this.orderCount;
       return joinComma(result);
     },
+    purchaseOptionPrice() {
+      let result = 0;
+      this.option.forEach(function (o) {
+        result += parseInt(o.totalPrice);
+      });
+      return joinComma(result);
+    },
   },
   methods: {
     purchase() {
@@ -167,8 +176,10 @@ export default {
         quantity: this.orderCount,
         price: this.product.price,
         totalPrice: this.product.price * this.orderCount,
+        option: this.option,
       });
       this.$store.commit("updateProduct", this.product);
+      this.$store.commit("updateOption", this.option);
       this.$router.push("/order/payment");
     },
     searchProduct(productId) {
@@ -189,10 +200,23 @@ export default {
       return joinComma(num);
     },
     addProductOption(evt) {
+      console.log("addProductOption");
       const option = JSON.parse(evt.target.value);
+      const price = option.price;
       option["count"] = 1;
+      option["totalPrice"] = price;
+      option["price"] = price;
       this.option.push(option);
     },
+    removeProductOption(evt) {
+      this.option = this.option.filter(o => o.id !== evt.id);
+      this.optionTotalPrice = this.optionTotalPrice - evt.price;
+    },
+    addOptionCount(evt) {
+      const optionIndex = this.option.findIndex((o) => o.id === evt.id);
+      this.option[optionIndex].count += 1;
+      this.option[optionIndex].totalPrice += evt.price;
+    }
   },
 };
 </script>

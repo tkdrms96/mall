@@ -2,6 +2,7 @@ export default {
   state: {
     orderItem: {},
     product: {},
+    option: [],
   },
   getters: {
     getOrderItem(state) {
@@ -9,6 +10,9 @@ export default {
     },
     getProduct(state) {
       return state.product;
+    },
+    getOption(state) {
+      return state.option;
     },
   },
   mutations: {
@@ -18,6 +22,9 @@ export default {
     updateProduct(state, payload) {
       return (state.product = payload);
     },
+    updateOption(state, payload) {
+      return (state.option = payload);
+    }
   },
   actions: {},
 };

@@ -21,15 +21,15 @@
             </td>
           </tr>
           <!-- [디자인 샘플] 개발에 활용 /design/03_주문결제.html 참고 -->
-          <tr v-if="false">
+          <tr v-for="option in option" v-bind:key="option.id">
             <td class="item flex">
               <div class="wrap_option">
-                <div class="tit">추가 상품</div>
-                <div class="data">sample data</div>
+                <div class="tit">{{ option.name }}</div>
+                <div class="data">{{ option.option }}</div>
               </div>
             </td>
-            <td class="quantity"><span class="txt">1개</span></td>
-            <td class="price"><span class="txt">3,000원</span></td>
+            <td class="quantity"><span class="txt">{{ option.count }}</span></td>
+            <td class="price"><span class="txt">{{ option.totalPrice + '원' }}</span></td>
           </tr>
         </tbody>
       </table>
@@ -44,15 +44,20 @@ export default {
     totalPrice() {
       return joinComma(this.orderItem.totalPrice);
     },
+    optionPrice(option) {
+      return joinComma(option);
+    }
   },
   created() {
     this.orderItem = this.$store.getters.getOrderItem;
     this.product = this.$store.getters.getProduct;
+    this.option = this.$store.getters.getOption;
     this.$emit("syncUpdate", this.orderItem);
   },
   data() {
     return {
       product: {},
+      option: [],
       orderItem: {
         price: 0,
       },
